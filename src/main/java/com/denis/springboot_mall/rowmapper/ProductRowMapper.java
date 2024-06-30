@@ -22,7 +22,7 @@ public class ProductRowMapper implements RowMapper<Product> {
 
 
 
-        product.setImage_url(resultSet.getString("image_url"));
+        product.setImageUrl(resultSet.getString("image_url"));
         product.setPrice(resultSet.getInt("price"));
         product.setStock(resultSet.getInt("stock"));
         product.setDescription(resultSet.getString("description"));
