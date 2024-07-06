@@ -2,6 +2,7 @@ package com.denis.springboot_mall.controller;
 
 
 import com.denis.springboot_mall.constant.ProductCategory;
+import com.denis.springboot_mall.dto.ProductQueryParams;
 import com.denis.springboot_mall.dto.ProductRequest;
 import com.denis.springboot_mall.model.Product;
 import com.denis.springboot_mall.service.ProductService;
@@ -24,7 +25,13 @@ public class ProductController {
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search
             ){
-        List<Product> productList = productService.getProducts(category,search);
+
+        //打包變數統一送到Dao層
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
+
+        List<Product> productList = productService.getProducts(productQueryParams);
 
         return  ResponseEntity.status(HttpStatus.OK).body(productList);
     }
