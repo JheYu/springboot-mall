@@ -6,6 +6,7 @@ import com.denis.springboot_mall.dto.ProductQueryParams;
 import com.denis.springboot_mall.dto.ProductRequest;
 import com.denis.springboot_mall.model.Product;
 import com.denis.springboot_mall.service.ProductService;
+import com.denis.springboot_mall.util.Page;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -25,7 +26,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getProducts(
+    public ResponseEntity<Page<Product>> getProducts(
             //查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search,
@@ -47,9 +48,19 @@ public class ProductController {
         productQueryParams.setLimit(limit);
         productQueryParams.setOffset(offset);
 
+        //取得 product list
         List<Product> productList = productService.getProducts(productQueryParams);
+        //取得product 總數
+        Integer total = productService.countProduct(productQueryParams);
 
-        return  ResponseEntity.status(HttpStatus.OK).body(productList);
+        //分頁
+        Page<Product> page  = new Page<>();
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResults(productList);
+
+        return  ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
     @GetMapping("/products/{productId}")
