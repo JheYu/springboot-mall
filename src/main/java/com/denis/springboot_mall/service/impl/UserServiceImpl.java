@@ -1,6 +1,7 @@
 package com.denis.springboot_mall.service.impl;
 
 import com.denis.springboot_mall.dao.UserDao;
+import com.denis.springboot_mall.dto.UserLoginRequest;
 import com.denis.springboot_mall.dto.UserRegisterRequest;
 import com.denis.springboot_mall.model.User;
 import com.denis.springboot_mall.service.UserService;
@@ -35,5 +36,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Integer userId) {
         return userDao.getUserById(userId);
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+        if(user==null){
+            log.warn("該email {}尚未註冊",userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        if(user.getPassword().equals(userLoginRequest.getPassword())){
+            return user;
+        }else{
+            log.warn("email {}的密碼不正確",userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
