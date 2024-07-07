@@ -1,6 +1,8 @@
 package com.denis.springboot_mall.dao.impl;
 
 import com.denis.springboot_mall.dao.OrderDao;
+import com.denis.springboot_mall.dto.OrderQueryParams;
+import com.denis.springboot_mall.dto.ProductQueryParams;
 import com.denis.springboot_mall.model.Order;
 import com.denis.springboot_mall.model.OrderItem;
 import com.denis.springboot_mall.rowmapper.OrderItemRowMapper;
@@ -105,5 +107,46 @@ public class OrderDaoImpl implements OrderDao {
         List<OrderItem> orderItemList = namedParameterJdbcTemplate.query(sql,map, new OrderItemRowMapper());
 
         return orderItemList;
+    }
+
+    @Override
+    public List<Order> getOrders(OrderQueryParams orderQueryParams) {
+        String sql = "SELECT order_id, user_id, total_amount, created_date, last_modified_date FROM order_info WHERE 1=1 ";
+
+        Map<String, Object> map = new HashMap<>();
+        //  查詢條件
+        sql = addFilteringSql(sql,map, orderQueryParams);
+        //  排序
+        sql = sql + " ORDER BY created_date DESC";
+        //分頁
+        sql = sql + " LIMIT :limit OFFSET :offset";
+        map.put("limit", orderQueryParams.getLimit());
+        map.put("offset", orderQueryParams.getOffset());
+
+        List<Order> orderList = namedParameterJdbcTemplate.query(sql,map, new OrderRowMapper());
+
+        return orderList;
+    }
+
+    @Override
+    public Integer countOrder(OrderQueryParams orderQueryParams) {
+        String sql = "SELECT COUNT(*) FROM order_info WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+
+        sql = addFilteringSql(sql,map, orderQueryParams);
+
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+
+        return total;
+    }
+
+    private String addFilteringSql(String sql, Map<String, Object> map, OrderQueryParams orderQueryParams){
+        //查詢條件
+        if(orderQueryParams.getUserId() != null){
+            sql = sql + " AND user_id = :userId";
+            map.put("userId", orderQueryParams.getUserId());
+        }
+        return sql;
     }
 }

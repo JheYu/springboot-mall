@@ -5,6 +5,7 @@ import com.denis.springboot_mall.dao.ProductDao;
 import com.denis.springboot_mall.dao.UserDao;
 import com.denis.springboot_mall.dto.BuyItem;
 import com.denis.springboot_mall.dto.CreateOrderRequest;
+import com.denis.springboot_mall.dto.OrderQueryParams;
 import com.denis.springboot_mall.dto.UserLoginRequest;
 import com.denis.springboot_mall.model.Order;
 import com.denis.springboot_mall.model.OrderItem;
@@ -95,5 +96,20 @@ public class OrderServiceImpl implements OrderServie {
         order.setOrderItemList(orderItemList);
 
         return order;
+    }
+
+    @Override
+    public List<Order> getOrders(OrderQueryParams orderQueryParams) {
+        List<Order> orderList = orderDao.getOrders(orderQueryParams);
+        for(Order order : orderList){
+            List<OrderItem> orderItemList = orderDao.getOderItemsByOrderId(order.getOrderId());
+            order.setOrderItemList(orderItemList);
+        }
+        return orderList;
+    }
+
+    @Override
+    public Integer countOrder(OrderQueryParams orderQueryParams) {
+        return orderDao.countOrder(orderQueryParams);
     }
 }
